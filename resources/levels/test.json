@@ -1,0 +1,28 @@
+{
+    "name": "Test level",
+    "author": "JReesW",
+    "lines": [
+        {"x1": 30, "y1": 210, "x2": 150, "y2": 210, "image": "brick_wall"},
+        {"x1": 30, "y1": 270, "x2": 150, "y2": 270, "image": "brick_wall"},
+        {"x1": 30, "y1": 210, "x2": 30, "y2": 270, "image": "brick_wall"},
+        {"x1": 150, "y1": 210, "x2": 240, "y2": 30, "image": "brick_wall"},
+        {"x1": 150, "y1": 270, "x2": 240, "y2": 450, "image": "brick_wall"},
+        {"x1": 240, "y1": 30, "x2": 610, "y2": 30, "image": "brick_wall"},
+        {"x1": 610, "y1": 30, "x2": 610, "y2": 450, "image": "brick_wall"},
+        {"x1": 610, "y1": 450, "x2": 240, "y2": 450, "image": "brick_wall"},
+
+        {"x1": 560, "y1": 80, "x2": 560, "y2": 120, "image": "wood_wall"},
+        {"x1": 560, "y1": 120, "x2": 520, "y2": 120, "image": "wood_wall"},
+        {"x1": 520, "y1": 120, "x2": 520, "y2": 80, "image": "wood_wall"},
+        {"x1": 520, "y1": 80, "x2": 560, "y2": 80, "image": "wood_wall"},
+
+        {"x1": 560, "y1": 360, "x2": 560, "y2": 400, "image": "wood_wall"},
+        {"x1": 560, "y1": 400, "x2": 520, "y2": 400, "image": "wood_wall"},
+        {"x1": 520, "y1": 400, "x2": 520, "y2": 360, "image": "wood_wall"},
+        {"x1": 520, "y1": 360, "x2": 560, "y2": 360, "image": "wood_wall"}
+    ],
+    "images": [
+        {"name": "brick_wall", "path": "walls/brick_wall"},
+        {"name": "wood_wall", "path": "walls/wood_wall"}
+    ]
+}

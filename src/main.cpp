@@ -1,8 +1,9 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
 #include <iostream>
 
 #include <settings.h>
-#include <gamestate.h>
+#include <types.h>
 #include <scenes.h>
 #include <load.h>
 
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]) {
         std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
         return 1;
     }
+    IMG_Init(IMG_INIT_PNG);
 
     SDL_Window* win = SDL_CreateWindow("Wolfenstein",
                                        SDL_WINDOWPOS_CENTERED,
@@ -74,8 +76,11 @@ int main(int argc, char* argv[]) {
             b = a;
             update(delta, state);
             render(renderer, state);
+            state.ticks += 1;
         }
     }
+
+    SDL_Log("Game stopped running");
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);

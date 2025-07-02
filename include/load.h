@@ -4,10 +4,9 @@
 #include <nlohmann/json.hpp>
 #include <string>
 #include <fstream>
+#include <SDL2/SDL_image.h>
 
-#include <gamestate.h>
-#include <player.h>
-#include <lines.h>
+#include <types.h>
 
 using json = nlohmann::json;
 

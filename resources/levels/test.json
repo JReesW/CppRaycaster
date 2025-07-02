@@ -21,8 +21,16 @@
         {"x1": 520, "y1": 400, "x2": 520, "y2": 360, "image": "wood_wall"},
         {"x1": 520, "y1": 360, "x2": 560, "y2": 360, "image": "wood_wall"}
     ],
+    "objects": [
+        {"type": "decoration", "name": "barrel", "x": 420, "y": 100},
+        {"type": "decoration", "name": "goon", "x": 420, "y": 400}
+    ],
     "images": [
         {"name": "brick_wall", "path": "walls/brick_wall"},
-        {"name": "wood_wall", "path": "walls/wood_wall"}
+        {"name": "wood_wall", "path": "walls/wood_wall"},
+        {"name": "barrel", "path": "objects/tnt_barrel"},
+        {"name": "goon_front_1", "path": "enemies/goon/front_1"},
+        {"name": "goon_front_2", "path": "enemies/goon/front_2"},
+        {"name": "goon", "path": "enemies/goon/front_1"}
     ]
 }

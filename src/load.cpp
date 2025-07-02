@@ -4,8 +4,8 @@
 void load_images(json data, Gamestate& state) {
     state.images.clear();
     for (const auto& image : data["images"]) {
-        std::string path = "resources/images/" + image["path"].get<std::string>() + ".bmp";
-        SDL_Surface* surface = SDL_LoadBMP(path.c_str());
+        std::string path = "resources/images/" + image["path"].get<std::string>() + ".png";
+        SDL_Surface* surface = IMG_Load(path.c_str());
         if (surface == nullptr) {
             SDL_LogError(SDL_LOG_CATEGORY_APPLICATION, "Failed to load image: %s", image["name"].get<std::string>().c_str());
         }
@@ -25,6 +25,17 @@ void load_lines(json data, Gamestate& state) {
     }
 }
 
+void load_objects(json data, Gamestate& state) {
+    state.objects.clear();
+    for (const auto& object : data["objects"]) {
+        float x = object["x"].get<float>();
+        float y = object["y"].get<float>();
+        state.objects.push_back(
+            {state.images[object["name"].get<std::string>()], Object, {x, y}, {1, 0}}
+        );
+    }
+}
+
 void load_level(std::string level, Gamestate& state){
     SDL_Log("Loading level: %s", level.c_str());
 
@@ -35,4 +46,5 @@ void load_level(std::string level, Gamestate& state){
 
     load_images(data, state);
     load_lines(data, state);
+    load_objects(data, state);
 }

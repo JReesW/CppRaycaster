@@ -93,3 +93,23 @@ bool line_circle_intersect(const line& ln, const point& center, const float& rad
     const point projection = a + ((b - a) * t);
     return distance(center, projection) <= radius;
 }
+
+float get_relative_angle(point& from, point& dir, point& to) {
+    float vx = to.x - from.x;
+    float vy = to.y - from.y;
+
+    float len = sqrt(vx*vx + vy*vy);
+    vx /= len;
+    vy /= len;
+
+    float dot = dir.x * vx + dir.y * vy;
+    if (dot < -1.0f) dot = -1.0f;
+    if (dot > 1.0f) dot = 1.0f;
+    float angle = acos(dot);
+
+    float cross = dir.x * vy - dir.y * vx;
+    if (cross < 0)
+        angle = -angle;
+
+    return angle; // in radians
+}

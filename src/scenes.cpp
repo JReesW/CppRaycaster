@@ -2,11 +2,14 @@
 #include <iostream>
 
 void handle_event(SDL_Event& event, Gamestate& state) {
-    if (event.key.keysym.sym == SDLK_q && (event.key.keysym.mod & KMOD_CTRL)) {
-        state.running = false;
-    }else if (event.type == SDL_QUIT) {
-        std::cout << "quit event" << std::endl;
-        state.running = false;
+    if (event.type == SDL_KEYDOWN) {
+        if (event.key.keysym.sym == SDLK_q && (event.key.keysym.mod & KMOD_CTRL)) {
+            SDL_Log("Quit triggered through Ctrl + Q");
+            state.running = false;
+        }else if (event.type == SDL_QUIT) {
+            SDL_Log("Quit event encountered");
+            state.running = false;
+        }
     }
 
     switch (state.scene) {
@@ -17,8 +20,8 @@ void handle_event(SDL_Event& event, Gamestate& state) {
 
 void update(const float& dt, Gamestate& state) {
     switch (state.scene) {
-        case Mapview: case FirstPerson:
-            update_mapview(dt, state); break;
+        case Mapview: update_mapview(dt, state); break;
+        case FirstPerson: update_firstperson(dt, state); break;
     }
 }
 

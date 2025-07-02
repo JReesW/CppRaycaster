@@ -7,6 +7,7 @@ namespace settings {
     const int FPS = 60;
     const float SCREEN_CAM_DIST = 15.0f;
     const int WALL_HEIGHT = 1200;
+    const float FOV = 60.0f;
 }
 
 #endif

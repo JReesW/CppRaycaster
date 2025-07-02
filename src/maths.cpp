@@ -8,6 +8,10 @@ float maths::deg2rad(int deg) {
     return (float)deg * (PI / 180.0);
 }
 
+float maths::rad2deg(float rad) {
+    return rad * (180.0f / PI);
+}
+
 float maths::clamp(const float& in, const float& min, const float& max) {
     return std::min(max, std::max(min, in));
 }

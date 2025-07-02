@@ -10,22 +10,19 @@ void render_player(SDL_Renderer* renderer, Player& player) {
     point start = player.position - direction;  // {player.position.x - direction.x, player.position.y - direction.y};
     point end = player.position + direction;  // {player.position.x + direction.x, player.position.y + direction.y};
     SDL_RenderDrawLine(renderer, start.x, start.y, end.x, end.y);
+    direction = direction.rotate(135.0f);
+    point end1 = end + direction;
+    SDL_RenderDrawLine(renderer, end.x, end.y, end1.x, end1.y);
+    direction = direction.rotate(90.0f);
+    end1 = end + direction;
+    SDL_RenderDrawLine(renderer, end.x, end.y, end1.x, end1.y);
 }
 
-void render_raycasts(SDL_Renderer* renderer, Gamestate& state) {
-    for (int x = 0; x < settings::SCREENWIDTH; x += 10) {
-        // TODO: Remove this once auto-sorted collision lists are implemented
-        float min_dist = 9999;
-        point closest {0, 0};
-        for (Collision c : state.collisions.at(x)) {
-            point p = c.location;
-            float new_dist = distance(state.player.position, p);
-            if (new_dist < min_dist) {
-                min_dist = new_dist;
-                closest = p;
-            }
-        }
-        SDL_RenderDrawLine(renderer, state.player.position.x, state.player.position.y, closest.x, closest.y);
+void render_objects(SDL_Renderer* renderer, Gamestate& state) {
+    for (Sprite& sprite : state.objects) {
+        auto [x, y] = sprite.position;
+        SDL_RenderDrawLine(renderer, x - 10, y - 10, x + 10, y + 10);
+        SDL_RenderDrawLine(renderer, x - 10, y + 10, x + 10, y - 10);
     }
 }
 
@@ -59,29 +56,7 @@ void handle_mapview(SDL_Event& event, Gamestate& state) {
 }
 
 void update_mapview(const float& dt, Gamestate& state) {
-    // MOVE
-    auto [nx, ny] = state.player.position;
-    if (state.keys & Key_W) {
-        nx += state.player.speed * cos(maths::deg2rad(state.player.angle));
-        ny += state.player.speed * sin(maths::deg2rad(state.player.angle));
-    }
-    if (state.keys & Key_S) {
-        nx -= state.player.speed * cos(maths::deg2rad(state.player.angle));
-        ny -= state.player.speed * sin(maths::deg2rad(state.player.angle));
-    }
-
-    // CHECK IF MOVEMENT DOESN'T COLLIDE
-    bool no_collision = true;
-    for (mapline ml : state.map) {
-        if (line_circle_intersect(ml.geometry, point{nx, ny}, 10)) {
-            no_collision = false;
-            break;
-        }
-    }
-    if (no_collision) {
-        state.player.position.x = nx;
-        state.player.position.y = ny;
-    }
+    move_player(dt, state, false);
 
     // ROTATE
     if (state.keys & Key_A) {
@@ -89,25 +64,6 @@ void update_mapview(const float& dt, Gamestate& state) {
     }
     if (state.keys & Key_D) {
         state.player.angle += 4.0;
-    }
-
-    // RAYCAST
-    for (int x = 0; x < settings::SCREENWIDTH; x++) {
-        // CLEAR COLLISIONS FOR THIS RAY
-        state.collisions.at(x).clear();
-
-        // CREATE THE RAY
-        float angle = maths::lerp(-30.0f, 30.0f, (float)x / (float)(settings::SCREENWIDTH - 1));
-        point raydir = point{1, 0}.rotate(state.player.angle + angle) * 1000.0;
-        line ray = {state.player.position, state.player.position + raydir};
-        
-        // CHECK COLLISIONS
-        for (mapline& ml : state.map) {
-            std::optional<point> i = intersection(ray, ml.geometry);
-            if (i != std::nullopt) {
-                state.collisions.at(x).push_back({i.value(), &ml});
-            }
-        }
     }
 }
 
@@ -125,11 +81,11 @@ void render_mapview(SDL_Renderer* renderer, Gamestate& state) {
 
     // RAYCASTING
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    render_raycasts(renderer, state);
 
     // PLAYER
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     render_player(renderer, state.player);
+    render_objects(renderer, state);
 
     SDL_RenderPresent(renderer);
 }

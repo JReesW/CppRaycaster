@@ -3,10 +3,10 @@
 
 #include <optional>
 
-#include <types.h>
-#include <settings.h>
-#include <maths.h>
-#include <lines.h>
+#include <types.hpp>
+#include <settings.hpp>
+#include <maths.hpp>
+#include <lines.hpp>
 
 void raycast(Gamestate& state);
 

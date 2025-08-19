@@ -1,4 +1,4 @@
-#include <types.h>
+#include <types.hpp>
 
 
 std::vector<Sprite*> Gamestate::get_sprites() {

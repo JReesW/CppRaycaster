@@ -1,4 +1,4 @@
-#include <player.h>
+#include <player.hpp>
 
 void move_player(const float& dt, Gamestate& state, bool allow_strafing) {
     auto [nx, ny] = state.player.position;

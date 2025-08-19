@@ -3,8 +3,8 @@
 
 #include <SDL2/SDL.h>
 
-#include <lines.h>
-#include <types.h>
+#include <lines.hpp>
+#include <types.hpp>
 
 void move_player(const float& dt, Gamestate& state, bool allow_strafing);
 

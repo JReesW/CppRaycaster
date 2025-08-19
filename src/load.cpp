@@ -1,4 +1,4 @@
-#include <load.h>
+#include <load.hpp>
 
 // SpriteType string_to_sprite_type(const std::string& type, const std::string& name) {
 //     if (type == "decoration") return string_to_decoration(name);

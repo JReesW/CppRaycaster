@@ -1,4 +1,4 @@
-#include <scenes.h>
+#include <scenes.hpp>
 #include <iostream>
 
 void handle_event(SDL_Event& event, Gamestate& state) {

@@ -1,4 +1,4 @@
-#include <raycast.h>
+#include <raycast.hpp>
 
 void raycast(Gamestate& state) {
     state.renderEntries.clear();

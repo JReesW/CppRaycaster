@@ -2,8 +2,9 @@
 #define VINDICTA_SCENES_H
 
 #include <SDL2/SDL.h>
-#include <scenes/mapview.h>
-#include <scenes/firstperson.h>
+
+#include <scenes/mapview.hpp>
+#include <scenes/firstperson.hpp>
 
 void handle_event(SDL_Event& event, Gamestate& state);
 

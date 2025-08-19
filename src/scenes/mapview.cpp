@@ -1,4 +1,4 @@
-#include <scenes/mapview.h>
+#include <scenes/mapview.hpp>
 #include <iostream>
 
 ////////////////////////

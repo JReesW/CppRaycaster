@@ -2,12 +2,12 @@
 #define VINDICTA_FIRSTPERSON_H
 
 #include <SDL2/SDL.h>
-#include <settings.h>
-#include <types.h>
-#include <maths.h>
-#include <player.h>
-#include <raycast.h>
-#include <scenes/mapview.h>
+#include <settings.hpp>
+#include <types.hpp>
+#include <maths.hpp>
+#include <player.hpp>
+#include <raycast.hpp>
+#include <scenes/mapview.hpp>
 
 void draw_slice(SDL_Surface* surface, int x, int y_top, int y_bot, SDL_Surface* texture, int dist_along);
 void render_background(SDL_Renderer* renderer, Gamestate& state);

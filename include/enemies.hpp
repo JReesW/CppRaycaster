@@ -1,6 +1,6 @@
 #ifndef VINDICTA_ENEMIES_H
 #define VINDICTA_ENEMIES_H
 
-#include <types.h>
+#include <types.hpp>
 
 #endif

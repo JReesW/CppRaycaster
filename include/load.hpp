@@ -7,8 +7,8 @@
 #include <memory>
 #include <SDL2/SDL_image.h>
 
-#include <types.h>
-#include <sprites.h>
+#include <types.hpp>
+#include <sprites.hpp>
 
 using json = nlohmann::json;
 

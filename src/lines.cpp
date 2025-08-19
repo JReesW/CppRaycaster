@@ -1,4 +1,4 @@
-#include <lines.h>
+#include <lines.hpp>
 
 ///////////////////
 // POINT METHODS //

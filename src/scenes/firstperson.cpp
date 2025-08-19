@@ -1,4 +1,4 @@
-#include <scenes/firstperson.h>
+#include <scenes/firstperson.hpp>
 #include <iostream>
 
 

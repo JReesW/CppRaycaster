@@ -1,4 +1,4 @@
-#include <maths.h>
+#include <maths.hpp>
 
 float maths::deg2rad(float deg) {
     return deg * (PI / 180.0);

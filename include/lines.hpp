@@ -4,8 +4,8 @@
 #include <optional>
 #include <string>
 
-#include <types.h>
-#include <maths.h>
+#include <types.hpp>
+#include <maths.hpp>
 
 float distance(const Point& a, const Point& b);
 float dot(const Point& a, const Point& b);

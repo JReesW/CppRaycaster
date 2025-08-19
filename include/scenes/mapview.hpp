@@ -5,12 +5,12 @@
 #include <algorithm>
 #include <set>
 
-#include <settings.h>
-#include <types.h>
-#include <lines.h>
-#include <player.h>
-#include <raycast.h>
-#include <maths.h>
+#include <settings.hpp>
+#include <types.hpp>
+#include <lines.hpp>
+#include <player.hpp>
+#include <raycast.hpp>
+#include <maths.hpp>
 
 
 void render_player(SDL_Renderer* renderer, Player& player);

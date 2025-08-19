@@ -2,10 +2,10 @@
 #include <SDL2/SDL_image.h>
 #include <iostream>
 
-#include <settings.h>
-#include <types.h>
-#include <scenes.h>
-#include <load.h>
+#include <settings.hpp>
+#include <types.hpp>
+#include <scenes.hpp>
+#include <load.hpp>
 
 template<typename T>
 bool errored(T* ptr, const char* func) {

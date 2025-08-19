@@ -24,8 +24,8 @@ void move_player(const float& dt, Gamestate& state, bool allow_strafing) {
 
     // CHECK IF MOVEMENT DOESN'T COLLIDE
     bool no_collision = true;
-    for (mapline ml : state.map) {
-        if (line_circle_intersect(ml.geometry, point{nx, ny}, 10)) {
+    for (Mapline ml : state.map) {
+        if (line_circle_intersect(ml.line, Point{nx, ny}, 10)) {
             no_collision = false;
             break;
         }

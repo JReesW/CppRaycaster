@@ -8,12 +8,12 @@ void raycast(Gamestate& state) {
 
         // CREATE THE RAY
         float angle = maths::lerp(-30.0f, 30.0f, (float)x / (float)(settings::SCREENWIDTH - 1));
-        point raydir = point{1, 0}.rotate(state.player.angle + angle) * 1000.0;
-        line ray = {state.player.position, state.player.position + raydir};
+        Point raydir = Point{1, 0}.rotate(state.player.angle + angle) * 1000.0;
+        Line ray = {state.player.position, state.player.position + raydir};
         
         // CHECK COLLISIONS
-        for (mapline& ml : state.map) {
-            std::optional<point> i = intersection(ray, ml.geometry);
+        for (Mapline& ml : state.map) {
+            std::optional<Point> i = intersection(ray, ml.line);
             if (i != std::nullopt) {
                 collisions.insert({distance(state.player.position, i.value()), Collision{i.value(), &ml, x}});
             }

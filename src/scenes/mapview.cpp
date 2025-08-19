@@ -6,12 +6,12 @@
 ////////////////////////
 
 void render_player(SDL_Renderer* renderer, Player& player) {
-    point direction = point{5.0, 0.0}.rotate(player.angle);
-    point start = player.position - direction;  // {player.position.x - direction.x, player.position.y - direction.y};
-    point end = player.position + direction;  // {player.position.x + direction.x, player.position.y + direction.y};
+    Point direction = Point{5.0, 0.0}.rotate(player.angle);
+    Point start = player.position - direction;  // {player.position.x - direction.x, player.position.y - direction.y};
+    Point end = player.position + direction;  // {player.position.x + direction.x, player.position.y + direction.y};
     SDL_RenderDrawLine(renderer, start.x, start.y, end.x, end.y);
     direction = direction.rotate(135.0f);
-    point end1 = end + direction;
+    Point end1 = end + direction;
     SDL_RenderDrawLine(renderer, end.x, end.y, end1.x, end1.y);
     direction = direction.rotate(90.0f);
     end1 = end + direction;
@@ -19,8 +19,8 @@ void render_player(SDL_Renderer* renderer, Player& player) {
 }
 
 void render_objects(SDL_Renderer* renderer, Gamestate& state) {
-    for (Sprite& sprite : state.objects) {
-        auto [x, y] = sprite.position;
+    for (Sprite* sprite : state.get_sprites()) {
+        auto [x, y] = sprite->position;
         SDL_RenderDrawLine(renderer, x - 10, y - 10, x + 10, y + 10);
         SDL_RenderDrawLine(renderer, x - 10, y + 10, x + 10, y - 10);
     }
@@ -74,8 +74,8 @@ void render_mapview(SDL_Renderer* renderer, Gamestate& state) {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     
     // MAP LINES
-    for (mapline ml : state.map) {
-        line& l = ml.geometry;
+    for (Mapline ml : state.map) {
+        Line& l = ml.line;
         SDL_RenderDrawLine(renderer, l.start.x, l.start.y, l.end.x, l.end.y);
     }
 

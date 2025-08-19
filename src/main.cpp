@@ -53,6 +53,9 @@ int main(int argc, char* argv[]) {
         {{50, 240}, 0}
     };
 
+    state.bufferSurface = SDL_CreateRGBSurfaceWithFormat(0, settings::SCREENWIDTH, settings::SCREENHEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
+    state.bufferTexture = SDL_CreateTextureFromSurface(renderer, state.bufferSurface);
+
     load_level("test", state);
 
 
@@ -81,6 +84,11 @@ int main(int argc, char* argv[]) {
     }
 
     SDL_Log("Game stopped running");
+
+    SDL_FreeSurface(state.bufferSurface);
+    SDL_DestroyTexture(state.bufferTexture);
+
+    // state.clear_images();
 
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(win);

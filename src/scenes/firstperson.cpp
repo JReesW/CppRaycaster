@@ -6,15 +6,16 @@ const SDL_Rect ceiling_r {0, 0, settings::SCREENWIDTH, settings::SCREENHEIGHT / 
 const SDL_Rect floor_r {0, settings::SCREENHEIGHT / 2, settings::SCREENWIDTH, settings::SCREENHEIGHT / 2};
 
 
+// TODO: maybe rename texture here to reflect that it isn't actually an SDL_Texture
 void draw_slice(SDL_Surface* surface, int x, int y_top, int y_bot, SDL_Surface* texture, int dist_along) {
-    int y_top_i = maths::clamp(y_top, 0, settings::SCREENHEIGHT);
-    int y_bot_i = maths::clamp(y_bot, 0, settings::SCREENHEIGHT);
+    int y_top_i = maths::clamp(y_top, 0, settings::SCREENHEIGHT - 1);
+    int y_bot_i = maths::clamp(y_bot, 0, settings::SCREENHEIGHT - 1);
 
     Uint32* source = (Uint32*)texture->pixels;
     Uint32* target = (Uint32*)surface->pixels;
 
     for (int y_target = y_top_i; y_target <= y_bot_i; y_target++) {
-        int y_source = std::round(maths::lerp(texture->h, 0, maths::invlerp(y_top, y_bot, y_target)));
+        int y_source = std::round(maths::lerp(texture->h - 1, 0, maths::invlerp(y_top, y_bot, y_target)));
         int x_source = dist_along % texture->w;
         target[y_target * surface->w + x] = source[y_source * texture->w + x_source];
     }
@@ -42,38 +43,33 @@ void render_walls(SDL_Surface* surface, const RenderEntry* entry, Gamestate& sta
     float color_factor = maths::clamp(300.0f - (apparent_dist / 2.0f), 0.0f, 255.0f);  // TODO: USE TO SHADE TEXTURES
 
     // CALCULATE THE DISTANCE ALONG THE HIT MAPLINE, TO DETERMINE WHICH COLUMN OF THE TEXTURE TO USE
-    int dist_along = static_cast<int>(std::round(distance(collision.location, collision.target->geometry.start))) * 6;
+    int dist_along = static_cast<int>(std::round(distance(collision.location, collision.target->line.start))) * 6;
     draw_slice(surface, collision.column, half - a_h_half, half + a_h_half, state.images[collision.target->image], dist_along);
 }
 
 void render_sprites(SDL_Surface* surface, const RenderEntry* entry, Gamestate& state) {\
-    Sprite sprite = std::get<Sprite>(entry->entry);
-    
-    SDL_Surface* image;
-    if (sprite.image != state.images["barrel"]) {
-        image = state.ticks % 20 < 10 ? state.images["goon_front_1"] : state.images["goon_front_2"];
-    } else {
-        image = sprite.image;
-    } 
+    Sprite* sprite = std::get<Sprite*>(entry->entry);
+    SpriteSheet* sheet = &state.sheets[sprite->sheet];
+    SDL_Rect rect = sheet->segments[sprite->sheet_segment];
 
     // RELATIVE ANGLE FROM PLAYER TO SPRITE
-    point dir = {cos(maths::deg2rad(state.player.angle)), sin(maths::deg2rad(state.player.angle))};
-    float angle_offset = get_relative_angle(state.player.position, dir, sprite.position);
+    Point dir = {cos(maths::deg2rad(state.player.angle)), sin(maths::deg2rad(state.player.angle))};
+    float angle_offset = get_relative_angle(state.player.position, dir, sprite->position);
 
     // APPARENT DISTANCE, HEIGHT, AND SCALE
     float apparent_dist = entry->depth * cosf(angle_offset);
     float apparent_height = (settings::SCREEN_CAM_DIST / apparent_dist) * 600.0f;  // TODO: Have this depend on the size of the sprite
-    float scale = apparent_height / image->h;
+    float scale = apparent_height / rect.h;
 
     // CALCULATING THE SPRITE'S BLIT POSITION
     float normalized_angle = angle_offset / maths::deg2rad(settings::FOV / 2);
     float x_offset = ((normalized_angle + 1.0f) * 0.5f) * settings::SCREENWIDTH;
-    float left = x_offset - image->w * scale;
+    float left = x_offset - rect.w * scale;
     float top = (settings::SCREENHEIGHT / 2.0f) + (apparent_height * scale / 3.0f);
 
     // DRAW THE SPRITE
-    SDL_Rect dest = {(int)left, (int)top, (int)(image->w * scale), (int)(image->h * scale)};
-    SDL_BlitScaled(image, NULL, surface, &dest);
+    SDL_Rect dest = {(int)left, (int)top, (int)(rect.w * scale), (int)(rect.h * scale)};
+    SDL_BlitScaled(sheet->image, &rect, surface, &dest);
     // TODO: Don't blit scaled, just manually draw sprites pixel by pixel.
 }
 
@@ -99,13 +95,21 @@ void update_firstperson(const float& dt, Gamestate& state) {
     move_player(dt, state, true);
     raycast(state);
 
+    for (Enemy& enemy : state.enemies) {
+        if (state.ticks % 30 == 0) {
+            enemy.sprite.sheet_segment = "front_1";
+        } else if (state.ticks % 30 == 15) {
+            enemy.sprite.sheet_segment = "front_2";
+        }
+    }
+
     // ADD SPRITES TO THE RENDER ENTRIES LIST IF THEY'RE MOSTLY WITHIN THE PLAYER'S VIEW
-    for (Sprite& sprite : state.objects) {
-        point dir = {cos(maths::deg2rad(state.player.angle)), sin(maths::deg2rad(state.player.angle))};
-        float degrees = maths::rad2deg(get_relative_angle(state.player.position, dir, sprite.position));
+    for (Sprite* sprite : state.get_sprites()) {
+        Point dir = {cos(maths::deg2rad(state.player.angle)), sin(maths::deg2rad(state.player.angle))};
+        float degrees = maths::rad2deg(get_relative_angle(state.player.position, dir, sprite->position));
 
         if (degrees > -40.0f && degrees < 40.0f) {
-            state.renderEntries.insert({distance(state.player.position, sprite.position), sprite});
+            state.renderEntries.insert({distance(state.player.position, sprite->position), sprite});
         }
     }
 }
@@ -117,29 +121,26 @@ void render_firstperson(SDL_Renderer* renderer, Gamestate& state) {
     render_background(renderer, state);
 
     // PREPARE SURFACE FOR PIXEL OPERATIONS
-    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, settings::SCREENWIDTH, settings::SCREENHEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
-    SDL_FillRect(surface, NULL, SDL_MapRGBA(surface->format, 0, 0, 0, 0));
-    SDL_LockSurface(surface);
+    // SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, settings::SCREENWIDTH, settings::SCREENHEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
+    // SDL_FillRect(surface, NULL, SDL_MapRGBA(surface->format, 0, 0, 0, 0));
+    SDL_FillRect(state.bufferSurface, NULL, SDL_MapRGBA(state.bufferSurface->format, 0, 0, 0, 0));
 
     for (auto i = state.renderEntries.rbegin(); i != state.renderEntries.rend(); ++i) {
         // IF THE ENTRY IS A COLLISION
         if (std::holds_alternative<Collision>(i->entry)) {
-            render_walls(surface, &*i, state);
-        }else if (std::holds_alternative<Sprite>(i->entry)) {
-            SDL_UnlockSurface(surface);
-            render_sprites(surface, &*i, state);
-            // if (state.debug) SDL_Log("SPRITE");
-            SDL_LockSurface(surface);
+            render_walls(state.bufferSurface, &*i, state);
+        }else if (std::holds_alternative<Sprite*>(i->entry)) {
+            render_sprites(state.bufferSurface, &*i, state);
         }
     }
 
     // FINISH PIXEL OPERATIONS
-    SDL_UnlockSurface(surface);
-    SDL_Texture* screenTexture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_RenderCopy(renderer, screenTexture, nullptr, nullptr);
+    // SDL_Texture* screenTexture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_UpdateTexture(state.bufferTexture, NULL, state.bufferSurface->pixels, state.bufferSurface->pitch);
+    SDL_RenderCopy(renderer, state.bufferTexture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
-    SDL_DestroyTexture(screenTexture);
+    // SDL_DestroyTexture(screenTexture);
+    // SDL_FreeSurface(surface);
 
-    SDL_RenderPresent(renderer);
     state.debug = false;
 }

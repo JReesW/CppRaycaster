@@ -35,7 +35,7 @@ float distance(const Point& a, const Point& b) {
 }
 
 float dot(const Point& a, const Point& b) {
-    return a.x * b.x + a.y + b.y;
+    return a.x * b.x + a.y * b.y;
 }
 
 //////////////////
@@ -82,16 +82,17 @@ std::optional<Point> intersection(const Line& a, const Line& b) {
 }
 
 bool line_circle_intersect(const Line& ln, const Point& center, const float& radius) {  // Checks whether a given line and circle intersect
-    // Only checks whether they intersect, not where
-    auto [a, b] = ln;
-    const float l2 = ((a.x - b.x) * (a.x - b.x)) + ((a.y - b.y) * (a.y - b.y));
-
-    // if a == b, then the line segment is just a point, return distance from point to circle center
-    if(l2 == 0.0) return distance(a, center);
-
-    const float t = std::max(0.0f, std::min(1.0f, dot(center - a, b - a) / l2));
-    const Point projection = a + ((b - a) * t);
-    return distance(center, projection) <= radius;
+    Point ab = ln.end - ln.start;
+    Point ac = center - ln.start;
+    Point ad = ab * (dot(ab, ac) / dot(ab, ab));
+    Point d = ln.start + ad;
+    if (distance(center, d) <= radius) {
+        float len = distance(ln.start, ln.end);
+        if (distance(ln.start, d) <= len && distance(ln.end, d) <= len) {
+            return true;
+        }
+    }
+    return false;
 }
 
 float get_relative_angle(Point& from, Point& dir, Point& to) {
@@ -112,4 +113,20 @@ float get_relative_angle(Point& from, Point& dir, Point& to) {
         angle = -angle;
 
     return angle; // in radians
+}
+
+Point normal(const Line& ln) {
+    // right-handed normal
+    float dist = distance(ln.start, ln.end);
+    float dx = (ln.end.x - ln.start.x) / dist;
+    float dy = (ln.end.y - ln.start.y) / dist;
+
+    return Point{-dy, dx};
+}
+
+Point midpoint(const Line& ln) {
+    float mx = (ln.start.x + ln.end.x) / 2;
+    float my = (ln.start.y + ln.end.y) / 2;
+
+    return Point{mx, my};
 }

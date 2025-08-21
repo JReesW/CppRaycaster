@@ -121,8 +121,6 @@ void render_firstperson(SDL_Renderer* renderer, Gamestate& state) {
     render_background(renderer, state);
 
     // PREPARE SURFACE FOR PIXEL OPERATIONS
-    // SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, settings::SCREENWIDTH, settings::SCREENHEIGHT, 32, SDL_PIXELFORMAT_RGBA32);
-    // SDL_FillRect(surface, NULL, SDL_MapRGBA(surface->format, 0, 0, 0, 0));
     SDL_FillRect(state.bufferSurface, NULL, SDL_MapRGBA(state.bufferSurface->format, 0, 0, 0, 0));
 
     for (auto i = state.renderEntries.rbegin(); i != state.renderEntries.rend(); ++i) {
@@ -135,12 +133,9 @@ void render_firstperson(SDL_Renderer* renderer, Gamestate& state) {
     }
 
     // FINISH PIXEL OPERATIONS
-    // SDL_Texture* screenTexture = SDL_CreateTextureFromSurface(renderer, surface);
     SDL_UpdateTexture(state.bufferTexture, NULL, state.bufferSurface->pixels, state.bufferSurface->pitch);
     SDL_RenderCopy(renderer, state.bufferTexture, nullptr, nullptr);
     SDL_RenderPresent(renderer);
-    // SDL_DestroyTexture(screenTexture);
-    // SDL_FreeSurface(surface);
 
     state.debug = false;
 }

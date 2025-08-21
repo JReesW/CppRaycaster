@@ -1,37 +1,37 @@
 #include <player.hpp>
 
+
 void move_player(const float& dt, Gamestate& state, bool allow_strafing) {
-    auto [nx, ny] = state.player.position;
+    float dx = 0;
+    float dy = 0;
     if (state.keys & Key_W) {
-        nx += state.player.speed * cos(maths::deg2rad(state.player.angle));
-        ny += state.player.speed * sin(maths::deg2rad(state.player.angle));
+        dx += state.player.speed * cos(maths::deg2rad(state.player.angle));
+        dy += state.player.speed * sin(maths::deg2rad(state.player.angle));
     }
     if (state.keys & Key_S) {
-        nx -= state.player.speed * cos(maths::deg2rad(state.player.angle));
-        ny -= state.player.speed * sin(maths::deg2rad(state.player.angle));
+        dx -= state.player.speed * cos(maths::deg2rad(state.player.angle));
+        dy -= state.player.speed * sin(maths::deg2rad(state.player.angle));
     }
 
     if (allow_strafing) {
         if (state.keys & Key_A) {
-            nx += state.player.speed * cos(maths::deg2rad(state.player.angle - 90.0f));
-            ny += state.player.speed * sin(maths::deg2rad(state.player.angle - 90.0f));
+            dx += state.player.speed * cos(maths::deg2rad(state.player.angle - 90.0f));
+            dy += state.player.speed * sin(maths::deg2rad(state.player.angle - 90.0f));
         }
         if (state.keys & Key_D) {
-            nx += state.player.speed * cos(maths::deg2rad(state.player.angle + 90.0f));
-            ny += state.player.speed * sin(maths::deg2rad(state.player.angle + 90.0f));
+            dx += state.player.speed * cos(maths::deg2rad(state.player.angle + 90.0f));
+            dy += state.player.speed * sin(maths::deg2rad(state.player.angle + 90.0f));
         }
     }
 
-    // CHECK IF MOVEMENT DOESN'T COLLIDE
-    bool no_collision = true;
+    Point d {dx, dy};
+    Point n = state.player.position + d;
+
+    // SLIDE MOVEMENT ALONG WALL IF COLLIDING
     for (Mapline ml : state.map) {
-        if (line_circle_intersect(ml.line, Point{nx, ny}, 10)) {
-            no_collision = false;
-            break;
+        if (line_circle_intersect(ml.line, n, 10)) {
+            d = d - normal(ml.line) * dot(d, normal(ml.line));
         }
     }
-    if (no_collision) {
-        state.player.position.x = nx;
-        state.player.position.y = ny;
-    }
+    state.player.position = state.player.position + d;
 }

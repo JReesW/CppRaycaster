@@ -16,4 +16,7 @@ bool line_circle_intersect(const Line& ln, const Point& center, const float& rad
 
 float get_relative_angle(Point& from, Point& dir, Point& to);
 
+Point normal(const Line& ln);
+Point midpoint(const Line& ln);
+
 #endif

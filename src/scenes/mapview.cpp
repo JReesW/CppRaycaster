@@ -7,8 +7,8 @@
 
 void render_player(SDL_Renderer* renderer, Player& player) {
     Point direction = Point{5.0, 0.0}.rotate(player.angle);
-    Point start = player.position - direction;  // {player.position.x - direction.x, player.position.y - direction.y};
-    Point end = player.position + direction;  // {player.position.x + direction.x, player.position.y + direction.y};
+    Point start = player.position - direction;
+    Point end = player.position + direction;
     SDL_RenderDrawLine(renderer, start.x, start.y, end.x, end.y);
     direction = direction.rotate(135.0f);
     Point end1 = end + direction;
@@ -77,10 +77,11 @@ void render_mapview(SDL_Renderer* renderer, Gamestate& state) {
     for (Mapline ml : state.map) {
         Line& l = ml.line;
         SDL_RenderDrawLine(renderer, l.start.x, l.start.y, l.end.x, l.end.y);
-    }
 
-    // RAYCASTING
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        Point mid = midpoint(ml.line);
+        Point norm = normal(ml.line);
+        SDL_RenderDrawLine(renderer, mid.x, mid.y, mid.x + (norm.x * 5), mid.y + (norm.y * 5));
+    }
 
     // PLAYER
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
